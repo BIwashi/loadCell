@@ -119,6 +119,6 @@ float AE_HX711_getGram(char num)
   //Serial.println( HX711_SCALE);
   //Serial.println( data);
   data = data / HX711_SCALE;
-
+  
   return data;
 }
