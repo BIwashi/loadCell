@@ -58,6 +58,9 @@ void loop()
   sprintf(S1, "%s [g] (0x%4x)", dtostrf((data - offset), 5, 3, s), AE_HX711_Read());
   Serial.println(S1);
 }
+
+// dtostrf(浮動小数点値,文字列の長さ,小数点以下の桁数,文字列バッファ)
+
 //------------------------------------------------------------------------------------
 
 void AE_HX711_Init(void)
