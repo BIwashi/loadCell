@@ -38,6 +38,7 @@ float AE_HX711_getGram(char num);
 
 float offset;
 
+//------------------------------------------------------------------------------------
 void setup()
 {
   Serial.begin(9600);
@@ -47,6 +48,7 @@ void setup()
   offset = AE_HX711_getGram(30);
 }
 
+//------------------------------------------------------------------------------------
 void loop()
 {
   float data;
@@ -56,6 +58,7 @@ void loop()
   sprintf(S1, "%s [g] (0x%4x)", dtostrf((data - offset), 5, 3, s), AE_HX711_Read());
   Serial.println(S1);
 }
+//------------------------------------------------------------------------------------
 
 void AE_HX711_Init(void)
 {
