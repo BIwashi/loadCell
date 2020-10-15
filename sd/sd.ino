@@ -1,6 +1,8 @@
 #include <SPI.h> 
 #include <SD.h>
 
+// https://ameblo.jp/geotechlab-workshop/entry-12566563241.html
+
 const int chipSelect = 10; // Arduino UNOでは10、Arduino MEGAでは53
 
 void setup(void)
