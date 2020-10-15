@@ -11,21 +11,12 @@ long AE_HX711_Averaging(long adc, char num);
 float AE_HX711_getGram(char num);
 const int chipSelect = 10; // Arduino UNOでは10、Arduino MEGAでは53
 
-/*-------------------------------------*/
-char filename[12] = "data000.log";
+/*-------リセットするごとに新しいファイル作成するための変数-------*/
+char filename[12] = "data000.csv";
 byte filenum_1 = 0;
 byte filenum_10 = 0;
 byte filenum_100 = 0;
 File dataFile;
-/*-------------------------------------*/
-
-////ファイル名を記憶しておくリスト変数
-//char** nameList;
-////リスト内に含まれるファイル数
-//int numList;
-//
-//int numFile = 1;
-//char fileName[12] ;
 
 //---------------------------------------------------//
 // ピンの設定
@@ -38,24 +29,6 @@ File dataFile;
 //---------------------------------------------------//
 #define OUT_VOL   0.002f      //定格出力 [V]
 #define LOAD      100000.0f   //定格容量 [g]
-
-//---------------------------------------------------//
-// ロードセル　シングルポイント（ ビーム型）　ＳＣ６０１　１２０ｋＧ [P-12035]
-//---------------------------------------------------//
-//#define OUT_VOL   0.001f      //定格出力 [V]
-//#define LOAD      120000.0f   //定格容量 [g]
-
-//---------------------------------------------------//
-// ロードセル　シングルポイント（ ビーム型）　ＳＣ１３３　２０ｋＧ [P-12034]
-//---------------------------------------------------//
-// #define OUT_VOL 0.002f //定格出力 [V]
-// #define LOAD 20000.0f  //定格容量 [g]
-
-//---------------------------------------------------//
-// ロードセル　シングルポイント（ビーム型）　ＳＣ６１６Ｃ　５００ｇ[P-12532]
-//---------------------------------------------------//
-//#define OUT_VOL   0.0007f   //定格出力 [V]
-//#define LOAD      500.0f    //定格容量 [g]
 
 float offset;
 
@@ -73,98 +46,8 @@ void setup()
   AE_HX711_Reset();
   offset = AE_HX711_getGram(30);
 
-  SD_init();
+  SD_init(); // SDカードの初期化とファイル選択
 
-
-
-
-
-
-
-
-
-
-  //  /* ----- Initialisation of SD card ------ */
-  //  Serial.print("Initializing SD card...");
-  //  //see if the card is present and can be initialized:
-  //  if (!SD.begin(chipSelect)) {
-  //    Serial.println("Card failed, or not present");
-  //    // don't do anything more:
-  //    return;
-  //  }
-  //  Serial.println("card initialized.");
-
-
-
-  //  /*--------------------------------------------------------------*/
-  //  //内部のファイルにアクセス
-  //  File root = SD.open("/");  //SDカードのルートフォルダ
-  //  String listTemp = "";
-  //  while (true) {
-  //    File entry = root.openNextFile();
-  //    if (!entry) {
-  //      //これ以上ファイルがない場合
-  //      break;
-  //    }
-  //
-  //    //ディレクトリ名ではない場合
-  //    if (!entry.isDirectory()) {
-  //      String fileName = entry.name();
-  //      listTemp += String(fileName);
-  //      listTemp += ",";
-  //
-  //      /*
-  //        //特定の種類のファイルだけを選び出すことも可能(ここでは音楽ファイルを抽出)
-  //        //ファイルの拡張子を取り出す
-  //        //一番後ろのピリオドから後の文字を抽出
-  //        String ext = fileName.substring(fileName.lastIndexOf('.'));
-  //        //拡張子が指定のものだけを入れていく
-  //        if (ext.equalsIgnoreCase(".wav") || ext.equalsIgnoreCase(".mp3")) {  //大文字か小文字かを無視する
-  //        listTemp += String(fileName);
-  //        listTemp += ",";
-  //        }
-  //      */
-  //    }
-  //    else {
-  //      //ディレクトリ内部を　検索する場合は、再起関数として同じ処理を呼び出す
-  //    }
-  //  }
-  //
-  //  if (listTemp.length() > 0) {
-  //    Serial.println(listTemp);
-  //
-  //    //リストの要素数を数え上げる
-  //    for (int i = 0; i < listTemp.length(); i++) {
-  //      i = listTemp.indexOf(',', i);  //コンマの位置を探す
-  //      numList++;
-  //    }
-  //
-  //    //リストの初期化
-  //    nameList = new char*[numList];
-  //
-  //    for (int i = 0; i < numList; i++) {
-  //      //カンマの位置を見つけ、
-  //      int index = listTemp.indexOf(',');
-  //      String temp = String(listTemp.substring(0, index));
-  //      nameList[i] = new char[temp.length() + 1];
-  //      temp.toCharArray(nameList[i], temp.length() + 1);
-  //      Serial.println(nameList[i]);
-  //      listTemp.remove(0, index + 1);
-  //    }
-  //
-  //    Serial.println(numList);
-  //  }
-  //  else {
-  //    //ファイルが見つからなかった場合は強制終了
-  //    return;
-  //  }
-  //  /*--------------------------------------------------------------*/
-  //
-  //  numFile += (int)numList;
-  //  fileName = numFile
-  //             //  + '.csv'
-  //
-  //             /*--------------------------------------------------------------*/
   Serial.println(" -----Start----- ");
   //  Serial.println("time weight [g] ");
 }
@@ -176,27 +59,19 @@ void loop()
   float data;
   char S1[20];
   char s[20];
-  time = millis();
+  //  time = millis();
   data = AE_HX711_getGram(5);
-  sprintf(S1, " %s [g] (0x%4x)", dtostrf((data - offset), 5, 3, s), AE_HX711_Read());
-  Serial.print(time);
-  Serial.println(S1);
+  sprintf(S1, " %s [g] (0x%4x)", dtostrf((data - offset), 5, 3, s), AE_HX711_Read()); // dtostrf(浮動小数点値,文字列の長さ,小数点以下の桁数,文字列バッファ)
+  //  Serial.print(time);
+  //  Serial.println(S1);
 
-//  SD_write_int((String)S1); // String型にキャストした。こんなことしていいの？
+  SD_write_Str((String)S1); // String型にキャストした。こんなことしていいの？
 
-  //  /* SDカードに書き込み */
-  //  File dataFile = SD.open("datalog.csv", FILE_WRITE);
-  //  if (dataFile)
-  //  {
-  //    dataFile.print(time);
-  //    dataFile.println(S1);
-  //  }
-  //  dataFile.close();
 }
 
-// dtostrf(浮動小数点値,文字列の長さ,小数点以下の桁数,文字列バッファ)
-
 //------------------------------------------------------------------------------------
+
+/*------------------function------------------*/
 
 void AE_HX711_Init(void)
 {
@@ -293,11 +168,10 @@ void SD_init() {
   dataFile = SD.open(filename, FILE_WRITE);
   Serial.print(F("ok."));
   Serial.println(filename);
-//  SdFile::dateTimeCallback( &dateTime );
 }
 
 /*-----------------受け取ったデータを書き込む-----------------*/
-void SD_write_int(String Data) {
+void SD_write_Str(String Data) {
   time = millis(); // 起動してからの時間
   dataFile = SD.open(filename, FILE_WRITE);
   if (dataFile) {
