@@ -27,8 +27,8 @@ File dataFile;
 //---------------------------------------------------//
 // ロードセル　Ｓ字型　ＳＣ３０１Ａ　１００ｋＧ [P-12036]
 //---------------------------------------------------//
-#define OUT_VOL   0.002f      //定格出力 [V]
-#define LOAD      100000.0f   //定格容量 [g]
+#define OUT_VOL 0.002f //定格出力 [V]
+#define LOAD 100000.0f //定格容量 [g]
 
 float offset;
 
@@ -38,7 +38,8 @@ void setup()
   Serial.begin(9600);
   Serial.println("loadcell begin");
 
-  while (!Serial) {
+  while (!Serial)
+  {
     ; // wait for serial port to connect. Needed for native USB port only
     //何らかの問題があってシリアルポートに接続できないときは、このループにトラップされる
   }
@@ -50,8 +51,8 @@ void setup()
 
   Serial.println(" -----Start----- ");
   //  Serial.println("time weight [g] ");
+  SD_write_Str("time, weight, g, -");
 }
-
 
 //------------------------------------------------------------------------------------
 void loop()
@@ -66,7 +67,6 @@ void loop()
   //  Serial.println(S1);
 
   SD_write_Str((String)S1); // String型にキャストした。こんなことしていいの？
-
 }
 
 //------------------------------------------------------------------------------------
@@ -141,19 +141,26 @@ float AE_HX711_getGram(char num)
 
 /*-----------------SDカードの初期化とファイル選択-----------------*/
 /* https://gist.github.com/EnsekiTT/6315684 */
-void SD_init() {
+void SD_init()
+{
   pinMode(SS, OUTPUT);
-  if (!SD.begin(chipSelect)) {
-    while (1);
+  if (!SD.begin(chipSelect))
+  {
+    while (1)
+      ;
   }
   Serial.println(F("SD ok."));
-  while (1) {
-    if (SD.exists(filename)) {
+  while (1)
+  {
+    if (SD.exists(filename))
+    {
       filenum_1++;
-      if (filenum_1 > 9) {
+      if (filenum_1 > 9)
+      {
         filenum_10++;
         filenum_1 = 0;
-        if (filenum_10 > 9) {
+        if (filenum_10 > 9)
+        {
           filenum_100++;
           filenum_10 = 0;
         }
@@ -161,7 +168,9 @@ void SD_init() {
       filename[4] = filenum_100 + 48;
       filename[5] = filenum_10 + 48;
       filename[6] = filenum_1 + 48;
-    } else {
+    }
+    else
+    {
       break;
     }
   }
@@ -171,17 +180,20 @@ void SD_init() {
 }
 
 /*-----------------受け取ったデータを書き込む-----------------*/
-void SD_write_Str(String Data) {
+void SD_write_Str(String Data)
+{
   time = millis(); // 起動してからの時間
   dataFile = SD.open(filename, FILE_WRITE);
-  if (dataFile) {
+  if (dataFile)
+  {
     dataFile.print(time);
     dataFile.println(Data);
     dataFile.close();
     Serial.print(time);
     Serial.println(Data);
   }
-  else {
+  else
+  {
     Serial.print(F("error opening "));
     Serial.println(filename);
   }
