@@ -50,9 +50,18 @@ void setup()
   SD_init(); // SDカードの初期化とファイル選択
 
   Serial.println(" -----Start----- ");
-  //  Serial.println("time weight [g] ");
-  SD_write_Str("time,weight,g,-");
-  Serial.println("time,weight,g,-");
+  dataFile = SD.open(filename, FILE_WRITE);
+  if (dataFile)
+  {
+    dataFile.println("time,weight,g,-");
+    dataFile.close();
+    Serial.println("time,weight,g,-");
+  }
+  else
+  {
+    Serial.print(F("error opening "));
+    Serial.println(filename);
+  }
 }
 
 //------------------------------------------------------------------------------------
@@ -63,7 +72,7 @@ void loop()
   char s[20];
   //  time = millis();
   data = AE_HX711_getGram(5);
-  sprintf(S1, " %s,[g],(0x%4x)", dtostrf((data - offset), 5, 3, s), AE_HX711_Read()); // dtostrf(浮動小数点値,文字列の長さ,小数点以下の桁数,文字列バッファ)
+  sprintf(S1, "%s,[g],(0x%4x)", dtostrf((data - offset), 5, 3, s), AE_HX711_Read()); // dtostrf(浮動小数点値,文字列の長さ,小数点以下の桁数,文字列バッファ)
   //  Serial.print(time);
   //  Serial.println(S1);
 
