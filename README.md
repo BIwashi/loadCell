@@ -1,4 +1,4 @@
-# Loadsell
+# Load Cell
 
 ![](img/1.jpg)
 ![](img/2.jpg)
